@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+<center>
+<h1>LinkIt Smart 7688 and Embedded Linux</h1>
+<h2>Jollen / Mokoversity.com<br />jollen@jollen.org</h2>
+<h2>2015/12/23</h2>
+</center>
+
+---
+
+# Agenda
+
+* 編譯與安裝 OpenWrt 套件
+* Kernel Modules
+* OpenWrt 的 root filesystem 結構
+* Service Daemon
+
+---
+
+# OpenWrt
+
+* Embedded Linux distribution
+* util-linux, uClibc and BusyBox
+* Web interface (LuCI)
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 0: Ubuntu Host
+
+準備 Ubuntu 開發主機，並安裝所需套件：
+
+~~~~~~~~
+$ sudo apt-get install git g++ libncurses5-dev subversion \
+libssl-dev gawk libxml-parser-perl unzip
+~~~~~~~~
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 1: Download OpenWrt Dist
+
+下載 OpenWrt 套件：
+
+~~~~~~~~
+$ git clone git://git.openwrt.org/openwrt.git
+~~~~~~~~
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 2: Update Feeds
+
+加入 LinkIt Smart 7688 Feeds 並更新 OpenWrt：
+
+~~~~~~~~
+$ cd openwrt
+$ cp feeds.conf.default feeds.conf
+$ echo src-git linkit https://github.com/MediaTek-Labs/
+linkit-smart-7688-feed.git >> feeds.conf
+$ ./scripts/feeds update
+$ ./scripts/feeds install -a
+~~~~~~~~
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 3: Menuconfig
+
+檢查必要套件，並進入設定選單：
+
+~~~~~~~~
+$ make prereq
+$ make menuconfig
+~~~~~~~~
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 4: Setup Options
+
+* Select the options as below:
+ * Target System: Ralink RT288x/RT3xxx
+ * Subtarget: MT7688 based boards
+ * Target Profile: LinkIt7688
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 5: Build OpenWrt
+
+編譯 OpenWrt：
+
+~~~~~~~~
+$ make V=99
+~~~~~~~~
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 6: Update 7688
+
+編譯好的 firmware 檔案位於 *bin/ramips/openwrt-ramips-mt7688-LinkIt7688-squashfs-sysupgrade.bin*，將此檔案上傳至 7688 並更新即可。
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 1: Application Packages
+
+![](images/5.png)
+
+---
+
+# 編譯與安裝 OpenWrt 套件 
+## Step 2/3: Build and Install
+
+```
+./bin/ramips/packages/packages/ffmpeg_2.6.2-1_ramips_24kec.ipk
+```
+
+使用 `opkg install <pkg-name>`
+
+---
+
+# Kernel Modules
+
+* 需要額外的驅動程式
+
+---
+
+# Kernel Modules
+# Step 1: Menuconfig
+
+---
+
+# Kernel Modules
+# Step 2: Additional Modules
+
+![](images/1.png)
+
+---
+
+# Kernel Modules
+# Step 3: Install
+
+* 不需要重新整個 Firmware
+* Kernel Modules 目錄
+
+```
+./staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/root-ramips/lib/modules/3.18.23/rtl8192de.ko
+./staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/root-ramips/lib/modules/3.18.23/rtl8192ce.ko
+./staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/root-ramips/lib/modules/3.18.23/rtl_pci.ko
+./staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/root-ramips/lib/modules/3.18.23/rtl8192cu.ko
+./staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/root-ramips/lib/modules/3.18.23/rtl_usb.ko
+./staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/root-ramips/lib/modules/3.18.23/rtl8187.ko
+./staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/root-ramips/lib/modules/3.18.23/rtl8192c-common.ko
+./staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/root-ramips/lib/modules/3.18.23/rtlwifi.ko
+```
+
+---
+
+# Service Daemon
+
+* avahi - Avahi is a system which facilitates service discovery on a local network via the mDNS/DNS-SD protocol suite
+* uhttpd - Web server
+* Samba - Samba is a free software re-implementation of the SMB/CIFS networking protocol
+* ntpd - The Network Time Protocol daemon (ntpd) is an operating system program that maintains the system time in synchronization with time servers 
+* dropbear - SSH server and client
+
+---
+
+# Service Daemon / avahi
+## Configuratin Files
+
+![](images/2.png)
+
+---
+
+# Service Daemon / avahi
+## Service Group
+
+```
+&lt;?xml version="1.0" standalone='no'?>&lt;!--*-nxml-*-->
+&lt;!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+&lt;service-group>
+ &lt;name replace-wildcards="yes">LinkIt Smart7688 WebUI on %h&lt;/name>
+  &lt;service>
+   &lt;type>_http._tcp&lt;/type>
+   &lt;port>80&lt;/port>
+   &lt;txt-record>path=/&lt;/txt-record>
+  &lt;/service>
+&lt;/service-group>
+```
+---
+
+# Service Daemon / avahi
+## Service Discover
+
+![](images/3.png)
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,3 @@
+[submodule "vcard"]
+	path = vcard
+    url = git@github.com:git@github.com:jollen/mokoid-nodejs-vcard-mongodb.git
