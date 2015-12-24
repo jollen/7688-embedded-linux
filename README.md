@@ -6,4 +6,9 @@
 
 * 歡迎貢獻與補充。
 
-<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="創用 CC 授權條款" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />本著作係採用<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">創用 CC 姓名標示 4.0 國際 授權條款</a>授權.
+# 網路資源
+
+* 官方文件, https://github.com/MediaTek-Labs/linkit-smart-7688-feed
+* FFmpeg 安裝示範, https://github.com/jollen/blog/issues/3
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="創用 CC 授權條款" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a>
